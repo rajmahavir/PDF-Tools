@@ -47,7 +47,7 @@ func getFooterHTML() string {
 		<div>
 			<a href="/credits" style="color: #667eea; text-decoration: none; margin: 0 10px;">Credits</a>
 			<span style="color: #ddd;">|</span>
-			<a href="https://github.com" target="_blank" style="color: #667eea; text-decoration: none; margin: 0 10px;">Source Code</a>
+			<a href="https://github.com/rajmahavir/PDF-Tools" target="_blank" style="color: #667eea; text-decoration: none; margin: 0 10px;">Source Code</a>
 			<span style="color: #ddd;">|</span>
 			<span style="margin: 0 10px;">MIT License</span>
 		</div>
