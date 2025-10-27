@@ -117,9 +117,9 @@ Contributions are welcome! Feel free to:
 
 ## 📧 Contact
 
-Created by [Your Name]
+Created by Raj
 
-GitHub: [yourusername]
+GitHub: rajmahavir
 
 ---
 
