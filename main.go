@@ -442,7 +442,7 @@ func handleCreditsPage(w http.ResponseWriter, r *http.Request) {
                 report issues, or contribute improvements.
             </p>
             <p>
-                <strong>Repository:</strong> <a href="https://github.com/yourusername/pdf-tools" target="_blank">github.com/yourusername/pdf-tools</a>
+                <strong>Repository:</strong> <a href="https://github.com/rajmahavir/PDF-Tools" target="_blank">github.com/rajmahavir/PDF-Tools</a>
             </p>
             <p style="margin-top: 15px;">
                 <strong>How to Contribute:</strong>
