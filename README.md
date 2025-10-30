@@ -1,207 +1,162 @@
 # 🔧 PDF Tools
 
-Free & Open Source web application for merging and editing PDF files.
+Free & Open Source client-side web application for editing PDF files. Works entirely in your browser - no server needed!
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
+![JavaScript](https://img.shields.io/badge/JavaScript-pdf--lib-yellow?logo=javascript)
 ![Built with Claude.ai](https://img.shields.io/badge/Built%20with-Claude.ai-8A2BE2)
 
 ## ✨ Features
 
-- **Remove Pages**: Delete specific pages from PDFs with visual page selector
-- **Merge PDFs**: Insert all pages from one PDF into another at any position
-- **PDF Preview**: View uploaded PDFs and see page counts before processing
-- **Privacy Focused**: Files are processed temporarily and deleted immediately
-- **No Registration**: Use freely without any account or tracking
-- **Mobile Friendly**: Works on desktop and mobile devices
+- **✂️ Remove Pages**: Delete specific pages from PDFs with visual page selector
+- **📄 Merge PDFs**: Combine multiple PDFs into one document
+- **⚡ Optimize PDF**: Reduce PDF file size by optimizing and compressing
+- **🔒 100% Privacy**: All processing happens in your browser - files never leave your device
+- **🚀 No Installation**: Just open the HTML file in any modern browser
+- **📱 Mobile Friendly**: Works on desktop, tablet, and mobile devices
+- **🌐 Works Offline**: After initial load, no internet connection required
 
 ## 🚀 Quick Start
 
-### Prerequisites
+**No installation or setup required!**
 
-- Go 1.21 or higher
-- Git (optional)
+### Option 1: Use Online (Easiest)
+Visit: [https://rajmahavir.github.io/PDF-Tools/pdf-tools-standalone.html](https://rajmahavir.github.io/PDF-Tools/pdf-tools-standalone.html)
 
-### Installation
+### Option 2: Download and Use Locally
+1. Download [`pdf-tools-standalone.html`](pdf-tools-standalone.html)
+2. Double-click the file or open it in any modern web browser
+3. Start processing PDFs immediately!
 
-1. Clone or download this repository
-```bash
-git clone https://github.com/rajmahavir/PDF-Tools.git
-cd PDF-Tools
-```
+That's it! No servers, no installations, no configuration.
 
-2. Install dependencies
-```bash
-go mod init pdf-tools
-go get github.com/pdfcpu/pdfcpu/pkg/api
-go get github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model
-```
+## 🎯 How It Works
 
-3. Run the application
-```bash
-go run main.go
-```
+1. **Select your PDF operation**: Choose from Remove Pages, Merge PDFs, or Optimize PDF
+2. **Upload your PDF(s)**: Select files from your device
+3. **Process**: All processing happens locally in your browser
+4. **Download**: Save your modified PDF
 
-4. Open your browser
-```
-http://localhost:8080
-```
-
-### Access from Mobile Devices
-
-1. Find your computer's IP address:
-   - Windows: Run `ipconfig` in Command Prompt
-   - Mac/Linux: Run `ifconfig` or `ip addr`
-
-2. On your mobile device (same WiFi):
-   - Open browser and go to `http://[YOUR-IP]:8080`
-   - Example: `http://192.168.1.100:8080`
-
-## 🤖 AI-Assisted Development
-
-This project was developed with significant assistance from **Claude.ai** (Anthropic's AI assistant). The collaboration involved:
-
-- Architecture design and code generation
-- User interface development
-- PDF processing implementation
-- Error handling and optimization
-
-**Model Used**: Claude Sonnet 4.5  
-**Platform**: [Claude.ai](https://claude.ai)
+**Your files never leave your device!** All operations are performed client-side using JavaScript.
 
 ## 🛠️ Technology Stack
 
-- **Backend**: Go (Golang)
-- **PDF Processing**: [pdfcpu](https://github.com/pdfcpu/pdfcpu)
-- **AI Assistant**: Claude.ai by Anthropic
-- **Frontend**: HTML, CSS, JavaScript (Vanilla)
+- **PDF Processing**: [pdf-lib](https://pdf-lib.js.org/) v1.17.1 (JavaScript library)
+- **Runtime**: Browser-based (no backend required)
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **Development**: AI-assisted with Claude.ai (Anthropic)
+
+## 🔒 Privacy & Security
+
+### Maximum Privacy Guaranteed
+
+- ✅ **All processing happens in your browser** - Files never uploaded to any server
+- ✅ **Works completely offline** after initial page load
+- ✅ **No tracking or analytics** - Zero data collection
+- ✅ **No cookies** - No user data stored
+- ✅ **No registration** - No accounts or sign-ups required
+- ✅ **Open Source** - Audit the code yourself
+
+**Your PDFs stay on your device. Period.**
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.txt) file for details.
 
-### Third-Party Licenses
+### Third-Party License
 
-- **pdfcpu**: Apache License 2.0
-- **Go**: BSD 3-Clause License
+- **pdf-lib**: MIT License - JavaScript PDF manipulation library
+  - Author: Andrew Dillon
+  - Repository: [https://github.com/Hopding/pdf-lib](https://github.com/Hopding/pdf-lib)
+  - License: [MIT License](https://github.com/Hopding/pdf-lib/blob/master/LICENSE.md)
 
 See [NOTICE.txt](NOTICE.txt) for full third-party attributions.
 
-## 🔒 Privacy & Security
-
-- All PDF processing happens on the server temporarily
-- Files are automatically deleted after processing
-- No data storage, tracking, or analytics
-- No cookies or user registration required
-- Open source - verify the code yourself
-
 ## 🙏 Acknowledgments
 
-- **Anthropic** - For creating Claude.ai
-- **Horst Rutter** - For developing pdfcpu
-- **Go Team** - For the Go programming language
-- **Open Source Community** - For making this possible
+- **Anthropic** - For creating Claude.ai, the AI assistant used to develop this project
+- **Andrew Dillon** - For creating and maintaining [pdf-lib](https://pdf-lib.js.org/)
+- **Open Source Community** - For making projects like this possible
 
-## 📝 Disclaimer
+## 🤖 AI-Assisted Development
 
-This tool is provided "as is" without warranty of any kind. Use at your own risk.
+This project was developed with significant assistance from **Claude.ai** (Anthropic's AI assistant).
+
+**Model Used**: Claude Sonnet 4.5
+**Platform**: [Claude.ai](https://claude.ai)
+
+## 🌐 Live Demo
+
+Try it now: [https://rajmahavir.github.io/PDF-Tools/pdf-tools-standalone.html](https://rajmahavir.github.io/PDF-Tools/pdf-tools-standalone.html)
+
+Or download and use locally - no internet required after initial load!
+
+## 📸 Screenshots
+
+### Home Page
+Choose between removing pages, merging PDFs, or optimizing file size with a clean, intuitive interface.
+
+### Remove Pages
+Visual page selector makes it easy to choose which pages to delete from your PDF.
+
+### Merge PDFs
+Combine multiple PDFs into a single document seamlessly.
+
+### Optimize PDF
+Reduce file size while maintaining quality.
+
+## 🐛 Known Limitations
+
+- Very large PDFs (>100MB) may cause browser memory issues
+- Some advanced PDF features (forms, annotations) may not be fully preserved
+- Browser-based optimization has limitations compared to specialized tools
+- Password-protected PDFs need to be unlocked first
+
+## 🔮 Future Features
+
+- [ ] Rotate pages
+- [ ] Split PDF into multiple files
+- [ ] Add watermarks
+- [ ] Extract specific page ranges
+- [ ] Reorder pages with drag-and-drop
+- [ ] Add page numbers
+- [ ] Compress images within PDFs
+
+## 🌍 Deployment
+
+### GitHub Pages (Recommended)
+1. Enable GitHub Pages in repository settings
+2. Select branch and root folder
+3. Access at: `https://rajmahavir.github.io/PDF-Tools/pdf-tools-standalone.html`
+
+### Other Options
+- **Netlify**: Drag & drop the HTML file
+- **Vercel**: Connect repository or upload file
+- **Cloudflare Pages**: Deploy from Git
+- **Any Static Hosting**: Upload the single HTML file
+- **Share Directly**: Email or share the HTML file - it works standalone!
 
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:
 
-- Report bugs via GitHub Issues
+- Report bugs via [GitHub Issues](https://github.com/rajmahavir/PDF-Tools/issues)
 - Submit feature requests
 - Create pull requests
 - Share the project
 
 ## 📧 Contact
 
-Created by Raj
+Created by **Raj**
 
-GitHub: rajmahavir
+GitHub: [rajmahavir](https://github.com/rajmahavir)
+
+## 📝 Disclaimer
+
+This tool is provided "as is" without warranty of any kind. Use at your own risk.
 
 ---
 
 **Made with ❤️ using Claude.ai**
-
-## 📸 Screenshots
-
-### Home Page
-Choose between removing pages or merging PDFs with a clean, intuitive interface.
-
-### Remove Pages
-Visual page selector makes it easy to choose which pages to delete.
-
-### Merge PDFs
-Insert one PDF into another at any position with live preview.
-
-## 🌐 Live Demo
-
-Visit: https://pdf-tools-production-bb6b.up.railway.app/
-
-## 🐛 Known Issues
-
-- Large PDFs (>50MB) may take longer to process
-- Some encrypted PDFs may not be supported
-
-## 🔮 Future Features
-
-- [ ] Rotate pages
-- [ ] Split PDF into multiple files
-- [ ] Compress PDF files
-- [ ] Add watermarks
-- [ ] Merge multiple PDFs at once
-- [ ] Extract specific page ranges
-
-## ⚙️ Configuration
-
-Default settings:
-- Port: 8080
-- Max file size: 50MB
-- Supported formats: PDF only
-
-To change port, edit `main.go`:
-```go
-port := "8080"  // Change to your preferred port
-```
-
-## 🧪 Testing
-
-Run locally and test with sample PDFs:
-```bash
-go run main.go
-```
-
-Open `http://localhost:8080` and upload test PDFs.
-
-## 📦 Building for Production
-
-Build executable:
-```bash
-go build -o pdf-tools
-```
-
-Run the executable:
-```bash
-# Windows
-pdf-tools.exe
-
-# Linux/Mac
-./pdf-tools
-```
-
-## 🌍 Deployment
-
-See deployment guides for:
-- Railway.app
-- Render.com
-- Fly.io
-- Oracle Cloud
-- Google Cloud Run
-
-Detailed instructions available in the [Deployment Guide](DEPLOYMENT.md) (if you create one).
-
----
 
 **Star ⭐ this repo if you find it useful!**
