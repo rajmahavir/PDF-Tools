@@ -28,14 +28,18 @@ func main() {
 	http.HandleFunc("/optimize-pdf", handleOptimize)
 	http.HandleFunc("/pdfinfo", handlePDFInfo)
 
-	port := "8080"
-	
+	// Get port from environment variable (for Railway, Render, etc.) or default to 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	fmt.Printf("Server starting on:\n")
 	fmt.Printf("  Local:   http://localhost:%s\n", port)
 	fmt.Printf("  Network: http://[YOUR-IP-ADDRESS]:%s\n", port)
 	fmt.Printf("\nReplace [YOUR-IP-ADDRESS] with your computer's IP address\n")
 	fmt.Printf("To find it on Windows, run: ipconfig\n\n")
-	
+
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
 }
 
