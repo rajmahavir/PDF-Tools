@@ -21,9 +21,11 @@ func main() {
 	http.HandleFunc("/", handleHome)
 	http.HandleFunc("/merge", handleMergePage)
 	http.HandleFunc("/remove", handleRemovePage)
+	http.HandleFunc("/optimize", handleOptimizePage)
 	http.HandleFunc("/credits", handleCreditsPage)
 	http.HandleFunc("/merge-pdfs", handleMerge)
 	http.HandleFunc("/remove-pages", handleRemovePages)
+	http.HandleFunc("/optimize-pdf", handleOptimize)
 	http.HandleFunc("/pdfinfo", handlePDFInfo)
 
 	port := "8080"
@@ -102,7 +104,7 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
         }
         .options-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-top: 20px;
         }
@@ -125,6 +127,9 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
         }
         .option-card.merge {
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+        .option-card.optimize {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
         }
         .option-icon {
             font-size: 48px;
@@ -163,6 +168,12 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
                 <div class="option-icon">📄</div>
                 <div class="option-title">Merge PDFs</div>
                 <div class="option-desc">Insert all pages from one PDF into another at any position</div>
+            </div>
+
+            <div class="option-card optimize" onclick="window.location.href='/optimize'">
+                <div class="option-icon">⚡</div>
+                <div class="option-title">Optimize PDF</div>
+                <div class="option-desc">Reduce PDF file size by optimizing images and removing unnecessary data</div>
             </div>
         </div>
         ` + getFooterHTML() + `
@@ -1550,16 +1561,6 @@ func handleMerge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if pdf1PageCount < 2 {
-		http.Error(w, fmt.Sprintf("First PDF must have multiple pages (found %d page)", pdf1PageCount), http.StatusBadRequest)
-		return
-	}
-
-	if pdf2PageCount < 2 {
-		http.Error(w, fmt.Sprintf("Second PDF must have multiple pages (found %d page)", pdf2PageCount), http.StatusBadRequest)
-		return
-	}
-
 	if pageNum > pdf1PageCount {
 		http.Error(w, fmt.Sprintf("Page number %d exceeds first PDF page count (%d pages)", pageNum, pdf1PageCount), http.StatusBadRequest)
 		return
@@ -1717,4 +1718,441 @@ func createPageRanges(pages []int) []string {
 	}
 	
 	return ranges
+}
+
+func handleOptimizePage(w http.ResponseWriter, r *http.Request) {
+	html := `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimize PDF - PDF Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        .back-btn {
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .upload-section {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-input-label:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        .file-name {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #666;
+            font-style: italic;
+        }
+        .pdf-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f7ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            font-size: 13px;
+            display: none;
+        }
+        .pdf-info.visible {
+            display: block;
+        }
+        .pdf-info strong {
+            color: #0066cc;
+        }
+        .hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            color: #856404;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .info-box ul {
+            color: #856404;
+            font-size: 13px;
+            margin-left: 20px;
+            line-height: 1.6;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        #pdfViewer {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .download-btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            margin-top: 10px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .size-comparison {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .size-comparison strong {
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">← Back to Home</a>
+        <h1>⚡ Optimize PDF</h1>
+        <p class="subtitle">Reduce file size by optimizing images and removing unnecessary data</p>
+
+        <div class="info-box">
+            <h3>What does optimization do?</h3>
+            <ul>
+                <li>Compresses images in the PDF</li>
+                <li>Removes duplicate resources</li>
+                <li>Optimizes file structure</li>
+                <li>Reduces file size without removing content</li>
+            </ul>
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-section">
+                <label for="pdf">Upload PDF *</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="pdf" name="pdf" accept=".pdf" required>
+                    <label for="pdf" class="file-input-label">
+                        Choose PDF file
+                    </label>
+                </div>
+                <div id="fileName" class="file-name"></div>
+                <div id="pdfInfo" class="pdf-info"></div>
+                <div class="hint">Maximum file size: 50MB</div>
+            </div>
+
+            <button type="submit">Optimize PDF</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #666;">Optimizing PDF... This may take a moment.</p>
+        </div>
+
+        <div id="result"></div>
+        ` + getFooterHTML() + `
+    </div>
+
+    <script>
+        var pdfInput = document.getElementById('pdf');
+        var fileName = document.getElementById('fileName');
+        var pdfInfoDiv = document.getElementById('pdfInfo');
+        var originalSize = 0;
+
+        pdfInput.addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                var file = e.target.files[0];
+                originalSize = file.size;
+                fileName.textContent = 'Selected: ' + file.name;
+                loadPDFInfo(file);
+            }
+        });
+
+        function loadPDFInfo(file) {
+            var formData = new FormData();
+            formData.append('pdf', file);
+
+            pdfInfoDiv.innerHTML = 'Loading info...';
+            pdfInfoDiv.classList.add('visible');
+
+            fetch('/pdfinfo', {
+                method: 'POST',
+                body: formData
+            }).then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                if (data.error) {
+                    pdfInfoDiv.innerHTML = 'Error: ' + data.error;
+                } else {
+                    pdfInfoDiv.innerHTML = '<strong>Pages:</strong> ' + data.pageCount +
+                                          ' | <strong>Size:</strong> ' + formatFileSize(file.size);
+                }
+            }).catch(function(error) {
+                pdfInfoDiv.innerHTML = 'Error loading PDF info';
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(e.target);
+            var resultDiv = document.getElementById('result');
+            var loadingDiv = document.getElementById('loading');
+            var submitBtn = e.target.querySelector('button[type="submit"]');
+
+            resultDiv.innerHTML = '';
+            loadingDiv.style.display = 'block';
+            submitBtn.disabled = true;
+
+            fetch('/optimize-pdf', {
+                method: 'POST',
+                body: formData
+            }).then(function(response) {
+                loadingDiv.style.display = 'none';
+                submitBtn.disabled = false;
+
+                if (response.ok) {
+                    return response.blob().then(function(blob) {
+                        var url = URL.createObjectURL(blob);
+                        var optimizedSize = blob.size;
+                        var reduction = ((originalSize - optimizedSize) / originalSize * 100).toFixed(1);
+                        var sizeComparisonHtml = '';
+
+                        if (optimizedSize < originalSize) {
+                            sizeComparisonHtml = '<div class="size-comparison">' +
+                                '<strong>Optimization Results:</strong><br>' +
+                                'Original size: ' + formatFileSize(originalSize) + '<br>' +
+                                'Optimized size: ' + formatFileSize(optimizedSize) + '<br>' +
+                                '<strong>Reduced by ' + reduction + '%</strong>' +
+                                '</div>';
+                        } else {
+                            sizeComparisonHtml = '<div class="info-box">' +
+                                '<h3>File is already optimized</h3>' +
+                                '<ul><li>The PDF is already well-optimized. No significant size reduction was possible.</li></ul>' +
+                                '</div>';
+                        }
+
+                        resultDiv.innerHTML =
+                            '<div class="success">PDF optimized successfully!</div>' +
+                            sizeComparisonHtml +
+                            '<iframe id="pdfViewer" src="' + url + '"></iframe>' +
+                            '<button class="download-btn" onclick="downloadPDF(\'' + url + '\')">Download Optimized PDF</button>';
+                    });
+                } else {
+                    return response.text().then(function(error) {
+                        resultDiv.innerHTML = '<div class="error">Error: ' + error + '</div>';
+                    });
+                }
+            }).catch(function(error) {
+                loadingDiv.style.display = 'none';
+                submitBtn.disabled = false;
+                resultDiv.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
+            });
+        });
+
+        function downloadPDF(url) {
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'optimized_' + Date.now() + '.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>`
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(html))
+}
+
+func handleOptimize(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
+	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+		http.Error(w, "File too large. Maximum size is 50MB", http.StatusBadRequest)
+		return
+	}
+
+	pdfFile, pdfHeader, err := r.FormFile("pdf")
+	if err != nil {
+		http.Error(w, "Error retrieving PDF", http.StatusBadRequest)
+		return
+	}
+	defer pdfFile.Close()
+
+	if filepath.Ext(pdfHeader.Filename) != ".pdf" {
+		http.Error(w, "Only PDF files are allowed", http.StatusBadRequest)
+		return
+	}
+
+	tempDir, err := os.MkdirTemp("", "pdfoptimize-*")
+	if err != nil {
+		http.Error(w, "Error creating temporary directory", http.StatusInternalServerError)
+		return
+	}
+	defer os.RemoveAll(tempDir)
+
+	inputPath := filepath.Join(tempDir, "input.pdf")
+	outputPath := filepath.Join(tempDir, "optimized.pdf")
+
+	if err := saveFile(pdfFile, inputPath); err != nil {
+		http.Error(w, "Error saving PDF", http.StatusInternalServerError)
+		return
+	}
+
+	// Optimize the PDF using pdfcpu
+	conf := model.NewDefaultConfiguration()
+	conf.StatsFileName = ""
+
+	if err := api.OptimizeFile(inputPath, outputPath, conf); err != nil {
+		http.Error(w, "Error optimizing PDF: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	optimizedPDF, err := os.ReadFile(outputPath)
+	if err != nil {
+		http.Error(w, "Error reading optimized PDF", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/pdf")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=optimized_%d.pdf", time.Now().Unix()))
+	w.Write(optimizedPDF)
 }

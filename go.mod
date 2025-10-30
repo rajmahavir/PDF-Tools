@@ -1,6 +1,6 @@
 module pdf-merger
 
-go 1.25.3
+go 1.21
 
 require (
 	github.com/clipperhouse/uax29/v2 v2.2.0 // indirect
