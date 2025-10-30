@@ -26,8 +26,8 @@ Free & Open Source web application for merging and editing PDF files.
 
 1. Clone or download this repository
 ```bash
-git clone https://github.com/yourusername/pdf-tools.git
-cd pdf-tools
+git clone https://github.com/rajmahavir/PDF-Tools.git
+cd PDF-Tools
 ```
 
 2. Install dependencies
