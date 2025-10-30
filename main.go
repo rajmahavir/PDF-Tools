@@ -1550,16 +1550,6 @@ func handleMerge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if pdf1PageCount < 2 {
-		http.Error(w, fmt.Sprintf("First PDF must have multiple pages (found %d page)", pdf1PageCount), http.StatusBadRequest)
-		return
-	}
-
-	if pdf2PageCount < 2 {
-		http.Error(w, fmt.Sprintf("Second PDF must have multiple pages (found %d page)", pdf2PageCount), http.StatusBadRequest)
-		return
-	}
-
 	if pageNum > pdf1PageCount {
 		http.Error(w, fmt.Sprintf("Page number %d exceeds first PDF page count (%d pages)", pageNum, pdf1PageCount), http.StatusBadRequest)
 		return
